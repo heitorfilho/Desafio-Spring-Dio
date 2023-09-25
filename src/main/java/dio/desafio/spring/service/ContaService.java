@@ -71,12 +71,14 @@ public class ContaService {
        contaRepository.save(conta);
     }
 
+    @Transactional
     public boolean desativarConta(Integer num_conta) {
         int rowsUpdated = contaRepository.disableConta(num_conta);
 
         return rowsUpdated > 0;
     }
 
+    @Transactional
     public boolean apagarConta(Integer num_conta) {
         if(!contaRepository.isContaAtiva(num_conta)){
             contaRepository.deleteConta(num_conta);

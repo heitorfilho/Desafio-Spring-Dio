@@ -2,6 +2,7 @@ package dio.desafio.spring.controller;
 
 import dio.desafio.spring.model.Conta;
 import dio.desafio.spring.service.ContaService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -38,9 +39,9 @@ public class ContaController {
     }
 
     @PostMapping("/saque/{num_conta}/{valor}")
-    public ResponseEntity<String> sacar(@PathVariable ("num_conta") Integer numConta, @PathVariable ("valor") float valor) {
+    public ResponseEntity<String> sacar(@PathVariable ("num_conta") Integer num_conta, @PathVariable ("valor") float valor) {
         try {
-            boolean saqueBemSucedido = contaService.sacar(numConta, valor);
+            boolean saqueBemSucedido = contaService.sacar(num_conta, valor);
 
             if (saqueBemSucedido) {
                 return ResponseEntity.ok("Saque realizado com sucesso.");
@@ -56,7 +57,33 @@ public class ContaController {
         }
     }
 
-    // Falta deposito
+    @PostMapping("/deposito/{num_conta}/{valor}")
+    public ResponseEntity<String> depositar(@PathVariable ("num_conta") Integer num_conta, @PathVariable ("valor") float valor) {
+        try {
+            boolean depositoBemSucedido = contaService.depositar(num_conta, valor);
+
+            if (depositoBemSucedido) {
+                return ResponseEntity.ok("Depósito realizado com sucesso.");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não foi possível realizar o depósito.");
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/desativar/{num_conta}")
+    public ResponseEntity<String> desativarConta(@PathVariable ("num_conta") Integer num_conta) {
+        boolean desativacaoBemSucedida = contaService.desativarConta(num_conta);
+
+        if (desativacaoBemSucedida) {
+            return ResponseEntity.ok("Conta desativada com sucesso.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não foi possível desativar a conta.");
+        }
+    }
 
     @DeleteMapping("/{num_conta}")
     public ResponseEntity<String> deletar(@PathVariable ("num_conta") Integer num_conta){
@@ -69,22 +96,4 @@ public class ContaController {
         }
     }
 
-
-
-
 }
-
-//    Sistema WEB/ API REST
-//        CRUD
-//
-//        Banco de dados: postgresql
-//
-//        API para Create, Read, Update, Delete Conta bancária
-//
-//        Os Principais dados de alteração serão o valor do saldo através de depósitos e saques
-//
-//        -----------------------------------
-//        Etapas
-//
-//        Criação das Classes Conta, Controller, Service, Model, Repository
-

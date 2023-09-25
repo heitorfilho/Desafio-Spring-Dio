@@ -27,13 +27,14 @@ public interface ContaRepository extends JpaRepository<Conta, Integer> {
     float findSaldoByNumConta(@Param("num_conta") Integer num_conta);
 
     // Sacar valor
+
     @Modifying
-    @Query("UPDATE Conta c SET c.saldo = c.saldo - :valor WHERE c.num_conta = :num_conta")
+    @Query("UPDATE Conta c SET c.saldo = (c.saldo - CAST(:valor AS float)) WHERE c.num_conta = :num_conta")
     int withdraw(@Param("num_conta") Integer num_conta, @Param("valor") float valor);
 
     // Depositar valor
     @Modifying
-    @Query("UPDATE Conta c SET c.saldo = c.saldo + :valor WHERE c.num_conta = :num_conta")
+    @Query("UPDATE Conta c SET c.saldo = (c.saldo + CAST(:valor AS float)) WHERE c.num_conta = :num_conta")
     int deposit(@Param("num_conta") Integer num_conta, @Param("valor") float valor);
 
     @Modifying
